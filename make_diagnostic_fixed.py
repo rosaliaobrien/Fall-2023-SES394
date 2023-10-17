@@ -64,13 +64,16 @@ def make_subplot(ax, skysurf_sky, skysurf_rms, data, cutouts, goodind = [], badi
     calc_rms = np.copy(skysurf_rms)
     
     # If the median pixel value of the data is negative, make it positive
-    clipped_median = np.ma.median(sigma_clip(data, sigma = 3))
+    # Run sigma_clip one time only to make the code more efficient
+    clipped_data = sigma_clip(data, sigma = 3)
+    clipped_median = np.ma.median(clipped_data)
     if clipped_median < 0:
         data += np.abs(clipped_median)
     
     # Find the sky and rms values you will use for plotting
-    plot_sky = np.ma.median(sigma_clip(data, sigma = 3))
-    plot_rms = np.ma.std(sigma_clip(data, sigma = 3))    
+    
+    plot_sky = np.ma.median(clipped_data)
+    plot_rms = np.ma.std(clipped_data)  
         
     # Set the minimum and maximum values for the colorbar
     minv = plot_sky-plot_rms
